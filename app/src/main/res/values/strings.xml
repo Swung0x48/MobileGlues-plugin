@@ -2,7 +2,6 @@
     <string name="app_name">MobileGlues</string>
 
     <string name="info_name" translatable="false">MobileGlues</string>
-    <string name="info_version" translatable="false">1.0.5</string>
     <string name="info_author" translatable="false">Swung, BZLZHH, Tungsten</string>
     <string name="info_copyright" translatable="false">Copyright © 2025 Swung0x48, BZLZHH, Tungsten. All rights reserved.\nLogo artwork kindly provided by Aou156.</string>
     <string name="info_launcher" translatable="false">Fold Craft Launcher (>=1.2.0.5)\nZalith Launcher (>=1.4.0)\nPojav Glow·Worm (>=20250211)</string>

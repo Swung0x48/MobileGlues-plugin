@@ -34,6 +34,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.ComponentActivity;
@@ -46,6 +47,7 @@ import com.fcl.plugin.mobileglues.settings.MGConfig;
 import com.fcl.plugin.mobileglues.settings.FolderPermissionManager;
 import com.fcl.plugin.mobileglues.utils.Constants;
 import com.fcl.plugin.mobileglues.utils.ResultListener;
+import com.fcl.plugin.mobileglues.BuildConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,6 +78,7 @@ public class MainActivity extends ComponentActivity implements AdapterView.OnIte
         MainActivityContext = this;
         openOptions = findViewById(R.id.open_options);
         Button clearPermission = findViewById(R.id.clear_permission);
+        TextView infoVersion = findViewById(R.id.info_version);
 
         inputMaxGlslCacheSize = findViewById(R.id.input_max_glsl_cache_size);
         optionLayout = findViewById(R.id.option_layout);
@@ -99,6 +102,8 @@ public class MainActivity extends ComponentActivity implements AdapterView.OnIte
         noErrorOptions.add(getString(R.string.option_no_error_disable_sec));
         ArrayAdapter<String> noErrorAdapter = new ArrayAdapter<>(this, R.layout.spinner, noErrorOptions);
         noErrorSpinner.setAdapter(noErrorAdapter);
+
+        infoVersion.setText(BuildConfig.VERSION_NAME);
 
         openOptions.setOnClickListener(view -> checkPermission());
         clearPermission.setOnClickListener(view -> {
