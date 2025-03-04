@@ -28,12 +28,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.ComponentActivity;
@@ -41,8 +36,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.fcl.plugin.mobileglues.databinding.ActivityMainBinding;
 import com.fcl.plugin.mobileglues.settings.MGConfig;
 import com.fcl.plugin.mobileglues.settings.FolderPermissionManager;
 import com.fcl.plugin.mobileglues.utils.Constants;
@@ -59,33 +54,18 @@ public class MainActivity extends ComponentActivity implements AdapterView.OnIte
     private static final int REQUEST_CODE_SAF = 2000;
     public static Uri MGDirectoryUri;
     public static Context MainActivityContext;
+    private ActivityMainBinding binding;
     private MGConfig config = null;
     private FolderPermissionManager folderPermissionManager;
     private Boolean State = true;
 
-    private Button openOptions;
-    private ConstraintLayout optionLayout;
-    private Spinner angleSpinner;
-    private Spinner noErrorSpinner;
-    private Switch extGL43Switch;
-    private Switch extCsSwitch;
-    private EditText inputMaxGlslCacheSize;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
         folderPermissionManager = new FolderPermissionManager(this);
         MainActivityContext = this;
-        openOptions = findViewById(R.id.open_options);
-        TextView infoVersion = findViewById(R.id.info_version);
-
-        inputMaxGlslCacheSize = findViewById(R.id.input_max_glsl_cache_size);
-        optionLayout = findViewById(R.id.option_layout);
-        angleSpinner = findViewById(R.id.spinner_angle);
-        noErrorSpinner = findViewById(R.id.spinner_no_error);
-        extGL43Switch = findViewById(R.id.switch_ext_gl43);
-        extCsSwitch = findViewById(R.id.switch_ext_cs);
 
         ArrayList<String> angleOptions = new ArrayList<>();
         angleOptions.add(getString(R.string.option_angle_disable_if_possible));
@@ -93,7 +73,7 @@ public class MainActivity extends ComponentActivity implements AdapterView.OnIte
         angleOptions.add(getString(R.string.option_angle_disable));
         angleOptions.add(getString(R.string.option_angle_enable));
         ArrayAdapter<String> angleAdapter = new ArrayAdapter<>(this, R.layout.spinner, angleOptions);
-        angleSpinner.setAdapter(angleAdapter);
+        binding.spinnerAngle.setAdapter(angleAdapter);
 
         ArrayList<String> noErrorOptions = new ArrayList<>();
         noErrorOptions.add(getString(R.string.option_no_error_auto));
@@ -101,11 +81,11 @@ public class MainActivity extends ComponentActivity implements AdapterView.OnIte
         noErrorOptions.add(getString(R.string.option_no_error_disable_pri));
         noErrorOptions.add(getString(R.string.option_no_error_disable_sec));
         ArrayAdapter<String> noErrorAdapter = new ArrayAdapter<>(this, R.layout.spinner, noErrorOptions);
-        noErrorSpinner.setAdapter(noErrorAdapter);
+        binding.spinnerNoError.setAdapter(noErrorAdapter);
 
-        infoVersion.setText(BuildConfig.VERSION_NAME);
+        binding.infoVersion.setText(BuildConfig.VERSION_NAME);
 
-        openOptions.setOnClickListener(view -> {
+        binding.openOptions.setOnClickListener(view -> {
             if (State) {
                 checkPermission();
             } else {
@@ -136,17 +116,17 @@ public class MainActivity extends ComponentActivity implements AdapterView.OnIte
             if (config.getMaxGlslCacheSize() == NULL)
                 config.setMaxGlslCacheSize(30);
             
-            inputMaxGlslCacheSize.setText(String.valueOf(config.getMaxGlslCacheSize()));
-            angleSpinner.setSelection(config.getEnableANGLE());
-            noErrorSpinner.setSelection(config.getEnableNoError());
-            extGL43Switch.setChecked(config.getEnableExtGL43() == 1);
-            extCsSwitch.setChecked(config.getEnableExtComputeShader() == 1);
+            binding.inputMaxGlslCacheSize.setText(String.valueOf(config.getMaxGlslCacheSize()));
+            binding.spinnerAngle.setSelection(config.getEnableANGLE());
+            binding.spinnerNoError.setSelection(config.getEnableNoError());
+            binding.switchExtGl43.setChecked(config.getEnableExtGL43() == 1);
+            binding.switchExtCs.setChecked(config.getEnableExtComputeShader() == 1);
 
-            angleSpinner.setOnItemSelectedListener(this);
-            noErrorSpinner.setOnItemSelectedListener(this);
-            extGL43Switch.setOnCheckedChangeListener(this);
-            extCsSwitch.setOnCheckedChangeListener(this);
-            inputMaxGlslCacheSize.addTextChangedListener(new TextWatcher() {
+            binding.spinnerAngle.setOnItemSelectedListener(this);
+            binding.spinnerNoError.setOnItemSelectedListener(this);
+            binding.switchExtGl43.setOnCheckedChangeListener(this);
+            binding.switchExtCs.setOnCheckedChangeListener(this);
+            binding.inputMaxGlslCacheSize.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void afterTextChanged(Editable s) {
                     String text = s.toString();
@@ -154,13 +134,13 @@ public class MainActivity extends ComponentActivity implements AdapterView.OnIte
                         try {
                             int number = Integer.parseInt(text);
                             if (number < -1 || number == 0) {
-                                inputMaxGlslCacheSize.setError("Error: number cannot be 0 or less than -1.");
+                                binding.inputMaxGlslCacheSize.setError("Error: number cannot be 0 or less than -1.");
                             }
                             config.setMaxGlslCacheSize(number);
                         } catch (NumberFormatException e) {
-                            inputMaxGlslCacheSize.setError("Error: invalid number.");
+                            binding.inputMaxGlslCacheSize.setError("Error: invalid number.");
                         } catch (IOException e) {
-                            inputMaxGlslCacheSize.setError("Error: unexpected error.");
+                            binding.inputMaxGlslCacheSize.setError("Error: unexpected error.");
                             throw new RuntimeException(e);
                         }
                     }
@@ -173,8 +153,8 @@ public class MainActivity extends ComponentActivity implements AdapterView.OnIte
                 public void onTextChanged(CharSequence charSequence, int start, int before, int after) {}
             });
             State = false;
-            openOptions.setText(getString(R.string.clear_permission));
-            optionLayout.setVisibility(View.VISIBLE);
+            binding.openOptions.setText(getString(R.string.clear_permission));
+            binding.optionLayout.setVisibility(View.VISIBLE);
         } catch (IOException e) {
             Logger.getLogger("MG").log(Level.SEVERE, "Failed to load config! Exception: ", e.getCause());
             Toast.makeText(this, getString(R.string.warning_load_failed), Toast.LENGTH_SHORT).show();
@@ -183,8 +163,8 @@ public class MainActivity extends ComponentActivity implements AdapterView.OnIte
 
     private void hideOptions() {
         State = true;
-        openOptions.setText(getString(R.string.open_options));
-        optionLayout.setVisibility(View.GONE);
+        binding.openOptions.setText(getString(R.string.open_options));
+        binding.optionLayout.setVisibility(View.GONE);
     }
 
     private void checkPermissionSilently() {
@@ -275,7 +255,7 @@ public class MainActivity extends ComponentActivity implements AdapterView.OnIte
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        if (adapterView == angleSpinner && config != null) {
+        if (adapterView == binding.spinnerAngle && config != null) {
             try {
                 if (i == 3 && isAdreno740()) {
                     new AlertDialog.Builder(this)
@@ -295,7 +275,7 @@ public class MainActivity extends ComponentActivity implements AdapterView.OnIte
                             .setNegativeButton(getString(R.string.dialog_negative), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    angleSpinner.setSelection(config.getEnableANGLE());
+                                    binding.spinnerAngle.setSelection(config.getEnableANGLE());
                                 }
                             })
                             .show();
@@ -308,7 +288,7 @@ public class MainActivity extends ComponentActivity implements AdapterView.OnIte
             }
         }
         
-        if (adapterView == noErrorSpinner && config != null) {
+        if (adapterView == binding.spinnerNoError && config != null) {
             try {
                 config.setEnableNoError(i);
             } catch (IOException e) {
@@ -325,7 +305,7 @@ public class MainActivity extends ComponentActivity implements AdapterView.OnIte
 
     @Override
     public void onCheckedChanged(final CompoundButton compoundButton, final boolean isChecked) {
-        if (compoundButton == extGL43Switch && config != null) {
+        if (compoundButton == binding.switchExtGl43 && config != null) {
             if (isChecked) {
                 new AlertDialog.Builder(MainActivity.this)
                         .setTitle(getString(R.string.dialog_title_warning))
@@ -351,7 +331,7 @@ public class MainActivity extends ComponentActivity implements AdapterView.OnIte
                         .setNegativeButton(getString(R.string.dialog_negative), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                extGL43Switch.setChecked(false);
+                                binding.switchExtGl43.setChecked(false);
                             }
                         })
                         .show();
@@ -364,7 +344,7 @@ public class MainActivity extends ComponentActivity implements AdapterView.OnIte
                 }
             }
         }
-        if (compoundButton == extCsSwitch && config != null) {
+        if (compoundButton == binding.switchExtCs && config != null) {
             if (isChecked) {
                 new AlertDialog.Builder(MainActivity.this)
                         .setTitle(getString(R.string.dialog_title_warning))
@@ -389,7 +369,7 @@ public class MainActivity extends ComponentActivity implements AdapterView.OnIte
                         .setNegativeButton(getString(R.string.dialog_negative), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                extCsSwitch.setChecked(false);
+                                binding.switchExtCs.setChecked(false);
                             }
                         })
                         .show();
